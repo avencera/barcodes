@@ -1,0 +1,18 @@
+#!/bin/bash
+start=`date +%s`
+
+TAG=$(git rev-parse --abbrev-ref HEAD)
+
+printf "Building dockerfile  \n\n"
+docker build . -t r.cfcr.io/praveenperera/avencera/barcodes:$TAG
+
+printf "Docker build complete  \n\n"
+docker push r.cfcr.io/praveenperera/avencera/barcodes:$TAG
+
+printf "Docker push complete  \n\n"
+
+say done 
+
+end=`date +%s` 
+SECONDS=$((end-start))
+echo "Done in: $(($SECONDS / 3600))hrs $((($SECONDS / 60) % 60))min $(($SECONDS % 60))sec"
