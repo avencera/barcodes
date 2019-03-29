@@ -12,12 +12,12 @@
         <p>This is a quick tool I put together for myself to help me generate barcodes. It currently
           very limitted, but if there is enough interest I could add more feature such as: </p>
         <ul>
+          <li>Improve function with smaller prefixes (larger number of total barcodes)</li>
           <li>Download an excel spreadsheet of all the UPC codes</li>
           <li>Download all barcode images organized into folders</li>
           <li>Generate different types of barcodes</li>
           <li>Generate GTIN13's</li>
           <li>Actual database to help associate barcodes with products</li>
-          <li>Work better with smaller prefixes (larger number of total barcodes)</li>
           <li>Other ideas welcome...</li>
         </ul>
         <p>If you have any feedback or feature requests you can email me at <a
@@ -59,7 +59,7 @@
     <br>
     <br>
     <h1 class="mb-2">Barcodes Table</h1>
-    <p>Prefix: <%= @prefix %></p>
+    <p>For prefix: <%= @prefix %></p>
     <br>
     <table class="table">
       <thead>
@@ -71,6 +71,7 @@
         </tr>
       <tbody>
         <%= for gen <- @generated do %>
+        <div class="barcode-data" id="<%= gen[:upc] %>"></div>
         <tr>
           <td> <%= gen[:uid] %> </td>
           <td>
@@ -79,8 +80,8 @@
           <td width="20%">
             <a href="" download="<%= gen[:upc] %>.png" id="image-link-<%= gen[:upc] %>">
               <canvas
-                      class="barcode"
-                      id="<%= gen[:upc] %>"
+                      class="barcode-canvas"
+                      id="canvas-<%= gen[:upc] %>"
                       jsbarcode-fontOptions="bold"
                       jsbarcode-format="upc"
                       jsbarcode-value="<%= gen[:upc] %>"
@@ -92,7 +93,7 @@
           <td width="20%">
             <a href="" download="<%= gen[:upc] %>.svg" id="svg-link-<%= gen[:upc] %>">
               <svg
-                   class="barcode"
+                   class="barcode-svg"
                    id="svg-<%= gen[:upc] %>"
                    jsbarcode-fontOptions="bold"
                    jsbarcode-format="upc"
