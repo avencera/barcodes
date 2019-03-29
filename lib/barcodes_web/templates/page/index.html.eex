@@ -9,8 +9,10 @@
     </div>
     <div class="row">
       <div class="col-lg">
-        <p>This is a quick tool I put together for myself to help me generate barcodes. It currently
-          very limitted, but if there is enough interest I could add more feature such as: </p>
+        <p>This is a quick tool I put together for myself to help me generate barcodes.
+          It is currently very limitted, but if there is enough interest I could add more features
+          such as:
+        </p>
         <ul>
           <li>Improve function with smaller prefixes (larger number of total barcodes)</li>
           <li>Download an excel spreadsheet of all the UPC codes</li>
