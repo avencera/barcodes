@@ -10,8 +10,9 @@ use Mix.Config
 # which you should run after static files are built and
 # before starting your production server.
 config :barcodes, BarcodesWeb.Endpoint,
-  http: [:inet6, port: System.get_env("PORT") || 4000],
-  url: [host: "example.com", port: 80],
+  http: [:inet6, port: System.get_env("PORT") || 5000],
+  url: [host: System.get_env("DOMAIN_NAME"), scheme: "https", port: 443],
+  secret_key_base: System.get_env("SECRET_KEY_BASE"),
   cache_static_manifest: "priv/static/cache_manifest.json"
 
 # Do not print debug messages in production
