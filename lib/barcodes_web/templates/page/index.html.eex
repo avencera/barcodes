@@ -1,35 +1,112 @@
-<section class="phx-hero">
-  <h1><%= gettext "Welcome to %{name}!", name: "Phoenix" %></h1>
-  <p>A productive web framework that<br/>does not compromise speed and maintainability.</p>
-</section>
+<div class="index-page">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg">
+        <h1 class="mb-3">
+          Generate GTIN12 Barcodes
+        </h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg">
+        <p>This is a quick tool I put together for myself to help me generate barcodes. It currently
+          very limitted, but if there is enough interest I could add more feature such as: </p>
+        <ul>
+          <li>Download an excel spreadsheet of all the UPC codes</li>
+          <li>Download all barcode images organized into folders</li>
+          <li>Generate different types of barcodes</li>
+          <li>Generate GTIN13's</li>
+          <li>Actual database to help associate barcodes with products</li>
+          <li>Work better with smaller prefixes (larger number of total barcodes)</li>
+          <li>Other ideas welcome...</li>
+        </ul>
+        <p>If you have any feedback or feature requests you can email me at <a
+             href="mailto:praveen@avencera.com">praveen@avencera.com</a> </p>
+        <br>
+        <br>
+        <h1 class="mb-3">Instructions</h1>
+        <p>
+          <ol>
+            <li> Enter your GS1 prefix in the form below and click "Generate Barcodes" button</li>
+            <li> Click on each barcode to download the image </li>
+          </ol>
+        </p>
+      </div>
+    </div>
+    <br>
+    <br>
+    <div class="row">
+      <div class="col-lg">
+        <div class="card">
+          <div class="card-header">
+            <p>Enter your GS1 Prefix Below</p>
+          </div>
+          <div class="card-body">
+            <%= form_for @conn, Routes.page_path(@conn, :generate), [as: :generate], fn f -> %>
+            <div class="form-group">
+              <%= text_input f, :prefix, class: "form-control", placeholder: "GS1 Prefix", value: @prefix%>
+            </div>
+            <div class="form-group">
+              <%= submit "Generate Barcodes", class: "btn" %>
+            </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
 
-<section class="row">
-  <article class="column">
-    <h2>Resources</h2>
-    <ul>
-      <li>
-        <a href="https://hexdocs.pm/phoenix/overview.html">Guides &amp; Docs</a>
-      </li>
-      <li>
-        <a href="https://github.com/phoenixframework/phoenix">Source</a>
-      </li>
-      <li>
-        <a href="https://github.com/phoenixframework/phoenix/blob/v1.4/CHANGELOG.md">v1.4 Changelog</a>
-      </li>
-    </ul>
-  </article>
-  <article class="column">
-    <h2>Help</h2>
-    <ul>
-      <li>
-        <a href="https://elixirforum.com/c/phoenix-forum">Forum</a>
-      </li>
-      <li>
-        <a href="https://webchat.freenode.net/?channels=elixir-lang">#elixir-lang on Freenode IRC</a>
-      </li>
-      <li>
-        <a href="https://twitter.com/elixirphoenix">Twitter @elixirphoenix</a>
-      </li>
-    </ul>
-  </article>
-</section>
+    <%= if length(@generated) > 0 do %>
+    <br>
+    <br>
+    <h1 class="mb-2">Barcodes Table</h1>
+    <p>Prefix: <%= @prefix %></p>
+    <br>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Unique ID</th>
+          <th>UPC</th>
+          <th>Barcode (PNG)</th>
+          <th>Barcode (SVG)</th>
+        </tr>
+      <tbody>
+        <%= for gen <- @generated do %>
+        <tr>
+          <td> <%= gen[:uid] %> </td>
+          <td>
+            <%= gen[:upc] %>
+          </td>
+          <td width="20%">
+            <a href="" download="<%= gen[:upc] %>.png" id="image-link-<%= gen[:upc] %>">
+              <canvas
+                      class="barcode"
+                      id="<%= gen[:upc] %>"
+                      jsbarcode-fontOptions="bold"
+                      jsbarcode-format="upc"
+                      jsbarcode-value="<%= gen[:upc] %>"
+                      jsbarcode-textmargin="0"
+                      jsbarcode-fontoptions="bold">
+              </canvas>
+            </a>
+          </td>
+          <td width="20%">
+            <a href="" download="<%= gen[:upc] %>.svg" id="svg-link-<%= gen[:upc] %>">
+              <svg
+                   class="barcode"
+                   id="svg-<%= gen[:upc] %>"
+                   jsbarcode-fontOptions="bold"
+                   jsbarcode-format="upc"
+                   jsbarcode-value="<%= gen[:upc] %>"
+                   jsbarcode-textmargin="0"
+                   jsbarcode-fontoptions="bold">
+              </svg>
+            </a>
+          </td>
+        </tr>
+        <% end %>
+      </tbody>
+      </thead>
+    </table>
+    <% end %>
+  </div>
+</div>

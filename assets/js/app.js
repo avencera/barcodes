@@ -1,17 +1,25 @@
-// We need to import the CSS so that webpack will load it.
-// The MiniCssExtractPlugin is used to separate it out into
-// its own CSS file.
-import css from "../css/app.css"
+import css from "../css/app.css";
+import "phoenix_html";
+import "blk-design-system/assets/js/blk-design-system";
+import JsBarcode from "jsbarcode";
+import $ from "jquery";
+window.jQuery = $;
+window.$ = $;
+import Base64 from "base-64";
 
-// webpack automatically bundles all modules in your
-// entry points. Those entry points can be configured
-// in "webpack.config.js".
-//
-// Import dependencies
-//
-import "phoenix_html"
+JsBarcode(".barcode").init();
 
-// Import local files
-//
-// Local files can be imported directly using relative paths, for example:
-// import socket from "./socket"
+const barcodes = document.getElementsByClassName("barcode");
+
+Array.prototype.forEach.call(barcodes, function(barcode) {
+  const image_link = document.getElementById(`image-link-${barcode.id}`);
+  const svg_link = document.getElementById(`svg-link-${barcode.id}`);
+
+  const dataURL = barcode.toDataURL();
+  const svg = document.getElementById(`svg-${barcode.id}`);
+
+  const b64 = Base64.encode(svg.outerHTML);
+
+  image_link.href = dataURL;
+  svg_link.href = `data:image/svg+xml;base64,\n${b64}`;
+});

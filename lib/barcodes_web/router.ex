@@ -17,6 +17,7 @@ defmodule BarcodesWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+    post "/generate", PageController, :generate
   end
 
   # Other scopes may use custom stacks.
