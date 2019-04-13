@@ -3,9 +3,10 @@ import "phoenix_html";
 import "blk-design-system/assets/js/blk-design-system";
 import JsBarcode from "jsbarcode";
 import $ from "jquery";
+import Base64 from "base-64";
+
 window.jQuery = $;
 window.$ = $;
-import Base64 from "base-64";
 
 JsBarcode(".barcode-canvas").init();
 JsBarcode(".barcode-svg").init();
