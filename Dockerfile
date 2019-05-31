@@ -1,47 +1,75 @@
-FROM elixir:alpine as asset-builder-mix-getter
+# STEP 1 - RELEASE BUILDER
+FROM elixir:1.8.1-alpine AS builder
 
-ENV HOME=/opt/app
-WORKDIR $HOME
+# setup up variables
+ARG APP_NAME
+ARG APP_VSN
+ARG PHOENIX_SUBDIR=.
 
-RUN mix do local.hex --force, local.rebar --force
+ENV APP_NAME=${APP_NAME} \
+    APP_VSN=${APP_VSN} 
 
-COPY config/ ./config/
-COPY mix.exs mix.lock ./
+# make directory
+RUN mkdir /app
+WORKDIR /app
 
-RUN mix deps.get
+# This step installs all the build tools we'll need
+RUN apk update && \
+    apk upgrade --no-cache && \
+    apk add --no-cache \
+    git \
+    nodejs \
+    yarn \
+    build-base && \
+    mix local.rebar --force && \
+    mix local.hex --force
 
-############################################################
-FROM node:10 as asset-builder
+# install rebar and hex
+RUN mix local.rebar --force
+RUN mix local.hex --force
 
-ENV HOME=/opt/app
-WORKDIR $HOME
+# elixir copy mix
+ENV MIX_ENV=prod
+RUN mkdir /app/_build/ /app/config/ /app/lib/ /app/priv/ /app/deps/ /app/rel/ /app/assets
 
-COPY --from=asset-builder-mix-getter $HOME/deps $HOME/deps
+COPY mix.exs /app/mix.exs
+COPY mix.lock /app/mix.lock
 
-WORKDIR $HOME/assets
-COPY assets/ ./
-RUN yarn install
-RUN ./node_modules/webpack/bin/webpack.js --mode="production"
+# install deps
+RUN mix do deps.get --only $MIX_ENV, deps.compile
 
-############################################################
-FROM elixir:alpine
+COPY config /app/config
+COPY lib /app/lib
+COPY priv /app/priv
+COPY rel /app/rel
 
-ENV HOME=/opt/app
-WORKDIR $HOME
+RUN mix compile
 
-RUN mix do local.hex --force, local.rebar --force
+COPY assets /app/assets
+RUN cd ${PHOENIX_SUBDIR}/assets && \
+    yarn install && \
+    yarn deploy && \
+    cd - && \
+    mix phx.digest
 
-COPY config/ $HOME/config/
-COPY mix.exs mix.lock $HOME/
+# create release
+RUN mkdir -p /opt/built &&\
+    mix release --verbose &&\
+    cp _build/prod/rel/${APP_NAME}/releases/${APP_VSN}/${APP_NAME}.tar.gz /opt/built &&\
+    cd /opt/built &&\ 
+    tar -xzf ${APP_NAME}.tar.gz &&\
+    rm ${APP_NAME}.tar.gz
 
-COPY lib/ ./lib
-
-COPY priv/ ./priv
+################################################################################
+## STEP 2 - FINAL
+FROM alpine:3.9
 
 ENV MIX_ENV=prod
 
-RUN mix do deps.get --only $MIX_ENV, deps.compile, compile
+RUN apk update && \
+    apk add --no-cache \
+    bash \
+    openssl-dev
 
-COPY --from=asset-builder $HOME/priv/static/ $HOME/priv/static/
-
-RUN mix phx.digest
+COPY --from=builder /opt/built /app
+WORKDIR /app
