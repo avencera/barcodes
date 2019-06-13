@@ -19,8 +19,9 @@ RUN apk update && \
     apk add --no-cache \
     git \
     nodejs \
-    yarn \
+    npm \
     build-base && \
+    npm i -g yarn && \
     mix local.rebar --force && \
     mix local.hex --force
 
@@ -28,29 +29,44 @@ RUN apk update && \
 RUN mix local.rebar --force
 RUN mix local.hex --force
 
-# elixir copy mix
+# elixir create diretories
 ENV MIX_ENV=prod
-RUN mkdir /app/_build/ /app/config/ /app/lib/ /app/priv/ /app/deps/ /app/rel/ /app/assets
+RUN mkdir \ 
+    /app/_build/ \
+    /app/config/ \
+    /app/lib/ \
+    /app/priv/ \ 
+    /app/deps/ \
+    /app/rel/ \
+    /app/assets
 
+# install deps and compile deps
 COPY mix.exs /app/mix.exs
 COPY mix.lock /app/mix.lock
-
-# install deps
 RUN mix do deps.get --only $MIX_ENV, deps.compile
-
-COPY config /app/config
-COPY lib /app/lib
-COPY priv /app/priv
-COPY rel /app/rel
-
 RUN mix compile
 
-COPY assets /app/assets
+# assets -- install javascript deps
+COPY assets/package.json /app/assets/package.json
+COPY assets/yarn.lock /app/assets/yarn.lock
 RUN cd ${PHOENIX_SUBDIR}/assets && \
     yarn install && \
+    cd -
+
+# assets -- build assets
+COPY assets /app/assets
+RUN cd ${PHOENIX_SUBDIR}/assets && \
     yarn deploy && \
-    cd - && \
-    mix phx.digest
+    cd -
+
+# copy config, priv and release directories
+COPY config /app/config
+COPY priv /app/priv
+COPY rel /app/rel
+RUN mix phx.digest
+
+# copy application code
+COPY lib /app/lib
 
 # create release
 RUN mkdir -p /opt/built &&\

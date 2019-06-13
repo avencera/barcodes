@@ -3,6 +3,11 @@
 |> Path.wildcard()
 |> Enum.map(&Code.eval_file(&1))
 
+cookie =
+  :crypto.hash(:sha256, "QqyfQIBT7j6HXkyxbnwmZixU79T83be0ApUyiAfo8T8")
+  |> Base.encode16()
+  |> String.to_atom()
+
 use Mix.Releases.Config,
   default_release: :default,
   default_environment: Mix.env()
@@ -17,7 +22,7 @@ environment :prod do
   set(include_erts: true)
   set(include_src: false)
 
-  set(cookie: :"yp8N/DX8TkAhBQez6zRqhwUvoztW6OdLVLPpekBsnKbGw6FqCmnxnpUub623TASStt6m2H")
+  set(cookie: cookie)
 
   set(
     config_providers: [
