@@ -9,7 +9,7 @@
     "base-64": "^0.1.0",
     "blk-design-system": "^1.0.2",
     "file-loader": "^4.2.0",
-    "jquery": "^3.3.1",
+    "jquery": "^3.5.0",
     "jsbarcode": "^3.11.0",
     "phoenix": "^1.4.10",
     "phoenix_html": "^2.13.2"
