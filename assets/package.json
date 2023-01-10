@@ -12,7 +12,7 @@
     "jquery": "^3.3.1",
     "jsbarcode": "^3.11.0",
     "phoenix": "^1.4.10",
-    "phoenix_html": "^2.13.2"
+    "phoenix_html": "^3.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
